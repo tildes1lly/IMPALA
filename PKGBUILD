@@ -1,5 +1,5 @@
 # Maintainer: Stephanie (@tildesilly) <steph@sirenhead.gay>
-pkgname=impala
+pkgname=impala-aur-helper
 pkgver=1.0.beta1
 pkgrel=1
 pkgdesc="Intelligent Manager for Packages, AUR, and Local Archives - A user-friendly AUR helper written in Python."
