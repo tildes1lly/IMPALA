@@ -13,7 +13,9 @@ def main():
         print("\\[impala] [bold]IMPALA requires root privileges to run. Please run as root or with sudo.[/bold]")
         sys.exit(1)
 
-    os.makedirs("/tmp/impala", exist_ok=True)
+    if not os.path.exists("/tmp/impala"):
+        os.makedirs("/tmp/impala", exist_ok=True)
+        os.chmod("/tmp/impala", 0o777)
 
     args = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
     flags = [arg for arg in sys.argv[1:] if arg.startswith("-")]
