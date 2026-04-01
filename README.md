@@ -38,7 +38,12 @@ COMING SOON: IMPALA has not yet been submitted to the AUR/is awaiting approval. 
 
 ### From PyPI
 
-COMING SOON: IMPALA has not yet been submitted to PyPI either. Once again this will be updated once you can install from PyPI.
+You can install IMPALA from PyPI with the following command:
+```bash
+pip install impala-aur-helper
+```
+
+View IMPALA on PyPI at: https://pypi.org/project/impala-aur-helper/1.0b1/
 
 ### From source
 
