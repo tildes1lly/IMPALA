@@ -2,6 +2,9 @@
 
 **Intelligent Manager for Packages, AUR, and Local Archives** - A user-friendly AUR helper written in Python <br><small> alternatively: (yet another) (almost) Instant AUR helper for Managing Packages And helping users navigate Linux cli tools as a whole. Amen.</small>
 
+![impala install vivaldi-snapshot output](README_media/impala_listpkgs.png) <br>
+![impala upgrade output](README_media/impala_upgrade.png) <br>
+
 ## Features
 
 - User friendly UX designed with beginners in mind, without sacrificing the comfort of advanced users:
