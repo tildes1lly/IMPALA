@@ -43,7 +43,7 @@ You can install IMPALA from PyPI with the following command:
 pip install impala-aur-helper
 ```
 
-View IMPALA on PyPI at: https://pypi.org/project/impala-aur-helper/1.0b1/
+View IMPALA on PyPI at: https://pypi.org/project/impala-aur-helper
 
 ### From source
 
