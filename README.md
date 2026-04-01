@@ -1,3 +1,7 @@
+[![AUR Version](https://img.shields.io/aur/version/impala-aur-helper)](https://aur.archlinux.org/packages/impala-aur-helper)
+[![PyPI Version](https://img.shields.io/pypi/v/impala-aur-helper)](https://pypi.org/project/impala-aur-helper)
+[![Python Version](https://img.shields.io/badge/python-3.8+-blue)](https://pypi.org/project/impala-aur-helper)
+[![License](https://img.shields.io/github/license/tildes1lly/IMPALA)](https://github.com/tildes1lly/IMPALA/blob/main/LICENSE)
 # IMPALA
 
 **Intelligent Manager for Packages, AUR, and Local Archives** - A user-friendly AUR helper written in Python <br><small> *(or: yet another (almost) Instant AUR helper for Managing Packages And helping users navigate Linux cli tools. Amen.)*
@@ -34,7 +38,26 @@ IMPALA requires the following packages to be installed:
 
 ### From the AUR (recommended)
 
-COMING SOON: IMPALA has not yet been submitted to the AUR/is awaiting approval. This readme will be updated once installing from the AUR is viable.
+IMPALA can be installed from the AUR using the following commands:
+```bash
+git clone https://aur.archlinux.org/impala-aur-helper.git
+cd impala-aur-helper
+makepkg -si
+```
+
+Or, chain them together like so:
+```bash
+git clone https://aur.archlinux.org/impala-aur-helper.git && cd impala-aur-helper && makepkg -si
+```
+**ALTERNATIVELY: If you have another AUR helper installed:**
+```bash
+yay -S impala-aur-helper
+```
+Or:
+```bash
+paru -S impala-aur-helper
+```
+Or using whatever other AUR helper you have installed.
 
 ### From PyPI
 
