@@ -1,0 +1,37 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "impala"
+version = "1.0-beta1"
+requires-python = ">= 3.8"
+dependencies = [
+  "httpx",
+  "rich",
+  "questionary"
+]
+authors = [
+  {name = "Stephanie (@tildesilly)", email = "steph@sirenhead.gay"}
+]
+maintainers = [
+  {name = "Stephanie (@tildesilly)", email = "steph@sirenhead.gay"}
+]
+description = "Intelligent Manager for Packages, AUR, and Local Archives - A user-friendly AUR helper written in Python."
+keywords = ["Arch Linux", "Package Manager", "AUR", "CLI"]
+
+license = "GPL-3.0-only"
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python"
+]
+
+[project.urls]
+Repository = "https://github.com/tildes1lly/impala"
+Issues = "https://github.com/tildes1lly/impala/issues"
+
+[project.scripts]
+impala = "cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["."]
