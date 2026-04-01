@@ -19,7 +19,7 @@ maintainers = [
 ]
 description = "Intelligent Manager for Packages, AUR, and Local Archives - A user-friendly AUR helper written in Python."
 keywords = ["Arch Linux", "Package Manager", "AUR", "CLI"]
-
+readme = "README.md"
 license = "GPL-3.0-only"
 classifiers = [
   "Development Status :: 4 - Beta",
