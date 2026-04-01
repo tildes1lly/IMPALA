@@ -129,7 +129,7 @@ git clone https://github.com/tildes1lly/IMPALA.git && cd IMPALA && pip install .
 
 **NOTE: Waterfox has a bad PKGBUILD as of this being written. That is why Waterfox was chosen for a comparison. The AUR helpers are all expected to fail here, the comparison is how long they'll take before erroring out of a bad PKGBUILD** <br>
 
-https://github.com/tildes1lly/IMPALA/raw/main/README_media/comparison.mp4
+[https://github.com/tildes1lly/IMPALA/raw/main/README_media/comparison.mp4](https://github.com/user-attachments/assets/b0057a5b-c293-4d64-be0f-278404fde13e)
 
 **NOTE: This video contains speed changes, as if it didn't it would be 13 minutes long.**
 <br>
