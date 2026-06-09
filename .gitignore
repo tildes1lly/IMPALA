@@ -1,0 +1,4 @@
+dist
+pkg
+.venv
+__pycache__

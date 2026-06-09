@@ -18,6 +18,29 @@ def main():
         os.chmod("/tmp/impala", 0o777)
 
     args = [arg for arg in sys.argv[1:] if not arg.startswith("-")]
+    raw_queries = [arg for arg in sys.argv[1:] if not arg.startswith("-") and not arg in ["install", "remove", "upgrade", "update", "help"]]
+    searches = []
+    query_num = 0
+    this_search = []
+    for query in raw_queries:
+        if query == "and":
+            if query_num == 0:
+                print(f"\\[impala] [bold red]Syntax error: unexpected '{query}' at the beginning of the command. Please provide a valid search query before using '{query}'.[/bold red]")
+                sys.exit(1)
+            searches.append(this_search)
+            this_search = []
+            query_num += 1
+        else:
+            this_search.append(query)
+
+        query_num += 1
+
+    if this_search != []:
+        searches.append(this_search) # add the last search query after the loop
+    else:
+        print(f"\\[impala] [bold red]Syntax error: unexpected 'and' at the end of the command. Please provide a valid search query after '{raw_queries[-1]}'.[/bold red]")
+        sys.exit(1)
+
     flags = [arg for arg in sys.argv[1:] if arg.startswith("-")]
 
     if not args:
@@ -33,62 +56,62 @@ def main():
         if len(args) < 2:
             print("\\[impala] [bold]Nothing provided to search for. Use 'impala help' for usage information.[/bold]")
             sys.exit(1)
+        for search in searches:
+            try:
+                aur_results = aur.search(search[0:])
+                pacman_results = pacman.search_repos(search[0:])
 
-        try:
-            aur_results = aur.search(args[1:])
-            pacman_results = pacman.search_repos(args[1:])
+            except hx.RequestError:
+                print(f"\\[impala] [bold red]Error occurred while searching for packages. This is most likely a network issue causing the AUR to become unreachable. If the issue persists, check your internet connection and run `ping aur.archlinux.org` to test for downtime.[/bold red]")
+                sys.exit(1)
 
-        except hx.RequestError:
-            print(f"\\[impala] [bold red]Error occurred while searching for packages. This is most likely a network issue causing the AUR to become unreachable. If the issue persists, check your internet connection and run `ping aur.archlinux.org` to test for downtime.[/bold red]")
-            sys.exit(1)
+            if not aur_results and not pacman_results:
+                print(f"\\[impala] [bold red]No packages found matching [/bold red][green]'{search[0:]}'[/green][bold red]. Try a less specific query? (example: [/bold red][green]'jdk8' -> 'jdk'[/green][bold red] and select the correct one.)[/bold red]")
+                sys.exit(0)
 
-        if not aur_results and not pacman_results:
-            print(f"\\[impala] [bold red]No packages found matching [/bold red][green]'{args[1:]}'[/green][bold red]. Try a less specific query? (example: [/bold red][green]'jdk8' -> 'jdk'[/green][bold red] and select the correct one.)[/bold red]")
-            sys.exit(0)
+            global_results = sorted(aur_results + pacman_results, key=lambda x: x["Name"])
 
-        global_results = sorted(aur_results + pacman_results, key=lambda x: x["Name"])
+            display.pkgtable(global_results)
 
-        display.pkgtable(global_results)
+            pkgs = questionary.text("Package(s) to install (#): ").ask()
+            if not pkgs or not pkgs.split():
+                print("\\[impala] [bold]No packages selected. Installation cancelled.[/bold]")
+                sys.exit(0)
 
-        pkgs = questionary.text("Package(s) to install (#): ").ask()
-        if not pkgs or not pkgs.split():
-            print("\\[impala] [bold]No packages selected. Installation cancelled.[/bold]")
-            sys.exit(0)
+            valid_pkgs = []
+            for pkg in pkgs.split():
+                if pkg.isdigit() and 0 < int(pkg) <= len(global_results):
+                    valid_pkgs.append(pkg)
+                else:
+                    print(f"\\[impala] [bold red]Invalid input: {pkg}. Please enter a valid package number. Other packages will still be processed.[/bold red]")
+            
+            if not valid_pkgs:
+                print("\\[impala] [bold]No valid packages selected. Installation cancelled.[/bold]")
+                sys.exit(0)
 
-        valid_pkgs = []
-        for pkg in pkgs.split():
-            if pkg.isdigit() and 0 < int(pkg) <= len(global_results):
-                valid_pkgs.append(pkg)
-            else:
-                print(f"\\[impala] [bold red]Invalid input: {pkg}. Please enter a valid package number. Other packages will still be processed.[/bold red]")
-        
-        if not valid_pkgs:
-            print("\\[impala] [bold]No valid packages selected. Installation cancelled.[/bold]")
-            sys.exit(0)
+            print(f"[bold white]Selected packages to install:[/bold white]")
+                    
+            for index, pkg in enumerate(valid_pkgs):
+                if global_results[int(pkg) - 1]['Repo'] == "[AUR]":
+                    print(f"[bold yellow]({index + 1})[/bold yellow] [green]{global_results[int(pkg) - 1]['Name']}[/green] from [cyan italic]{global_results[int(pkg) - 1]['Repo']}[/cyan italic]")
+                else:
+                    print(f"[bold yellow]({index + 1})[/bold yellow] [green]{global_results[int(pkg) - 1]['Name']}[/green] from [bold](pacman.conf)[/bold] [cyan italic]{global_results[int(pkg) - 1]['Repo']}[/cyan italic]")
 
-        print(f"[bold white]Selected packages to install:[/bold white]")
-                
-        for index, pkg in enumerate(valid_pkgs):
-            if global_results[int(pkg) - 1]['Repo'] == "[AUR]":
-                print(f"[bold yellow]({index + 1})[/bold yellow] [green]{global_results[int(pkg) - 1]['Name']}[/green] from [cyan italic]{global_results[int(pkg) - 1]['Repo']}[/cyan italic]")
-            else:
-                print(f"[bold yellow]({index + 1})[/bold yellow] [green]{global_results[int(pkg) - 1]['Name']}[/green] from [bold](pacman.conf)[/bold] [cyan italic]{global_results[int(pkg) - 1]['Repo']}[/cyan italic]")
+            if not questionary.confirm("Proceed with installation?").ask():
+                print("\\[impala] [bold]Installation cancelled.[/bold]")
+                sys.exit(0)
+            failed_installs = []
+            for pkg in valid_pkgs:
+                if global_results[int(pkg) - 1]['Repo'] == "[AUR]":
+                    if not actions.install_aur(global_results[int(pkg) - 1]):
+                        failed_installs.append(global_results[int(pkg) - 1])
+                else:
+                    if not actions.install_pacman(global_results[int(pkg) - 1]):
+                        failed_installs.append(global_results[int(pkg) - 1])
 
-        if not questionary.confirm("Proceed with installation?").ask():
-            print("\\[impala] [bold]Installation cancelled.[/bold]")
-            sys.exit(0)
-        failed_installs = []
-        for pkg in valid_pkgs:
-            if global_results[int(pkg) - 1]['Repo'] == "[AUR]":
-                if not actions.install_aur(global_results[int(pkg) - 1]):
-                    failed_installs.append(global_results[int(pkg) - 1])
-            else:
-                if not actions.install_pacman(global_results[int(pkg) - 1]):
-                    failed_installs.append(global_results[int(pkg) - 1])
-
-        if failed_installs:
-            display.pkgtable(failed_installs)
-            print(f"\\[impala] [bold red]Failed to install {len(failed_installs)} package(s). Please check the above list and try installing manually. If an AUR package failed, it is likely due to a bad PKGBUILD, consider installing a similar package instead, or contact the maintainers.[/bold red]")
+            if failed_installs:
+                display.pkgtable(failed_installs)
+                print(f"\\[impala] [bold red]Failed to install {len(failed_installs)} package(s). Please check the above list and try installing manually. If an AUR package failed, it is likely due to a bad PKGBUILD, consider installing a similar package instead, or contact the maintainers.[/bold red]")
 
     elif args[0] == "remove":
         if len(args) < 2:
